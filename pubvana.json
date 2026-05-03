@@ -1,0 +1,21 @@
+{
+    "display_name": "Admin",
+    "description": "Pubvana CMS admin panel",
+    "category": "admin",
+    "provides": {
+        "content_types": [],
+        "content_type_supports": [],
+        "blocks": [
+            {
+                "key": "pubvana.admin.search",
+                "label": "Search Form",
+                "description": "Site search form"
+            },
+            {
+                "key": "pubvana.admin.text",
+                "label": "Text Block",
+                "description": "Free-form text or HTML content"
+            }
+        ]
+    }
+}

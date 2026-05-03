@@ -39,9 +39,11 @@ abstract class AdminController
 
         $user = $this->app->auth()->user();
         $userGroups = '';
+        $profile = null;
         if ($user !== null) {
             $groups = $user->getGroups();
             $userGroups = implode(', ', $groups);
+            $profile = $data['profile'] ?? $this->app->profiles()->findByUserId((int) $user->id);
         }
 
         $config = $this->app->get($this->configPrepend) ?? [];
@@ -51,6 +53,7 @@ abstract class AdminController
             'pageTitle'  => $data['pageTitle'] ?? 'Dashboard',
             'siteName'   => $this->app->get('CMS.siteName') ?? 'Pubvana',
             'user'       => $user,
+            'profile'    => $profile,
             'userGroups' => $userGroups,
             'menuSlots'  => [
                 'content'    => $this->app->adext('menu', 'content'),

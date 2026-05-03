@@ -68,11 +68,16 @@
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link d-flex lh-1 text-reset p-0 ps-2" data-bs-toggle="dropdown"
                        aria-label="User menu">
+                        <?php $displayName = !empty($profile->display_name) ? $profile->display_name : ($user->username ?? 'Admin'); ?>
+                        <?php if (!empty($profile->avatar)): ?>
+                        <span class="avatar avatar-sm rounded-circle" style="background-image: url(<?= rtrim(\Flight::app()->get('flight.base_url'), '/') ?>/<?= htmlspecialchars(ltrim($profile->avatar, '/')) ?>)"></span>
+                        <?php else: ?>
                         <span class="avatar avatar-sm rounded-circle bg-blue-lt">
-                            <?= strtoupper(substr($user->username ?? 'A', 0, 1)) ?>
+                            <?= strtoupper(substr($displayName, 0, 1)) ?>
                         </span>
+                        <?php endif; ?>
                         <div class="d-none d-xl-block ps-2">
-                            <div><?= htmlspecialchars($user->username ?? 'Admin') ?></div>
+                            <div><?= htmlspecialchars($displayName) ?></div>
                             <div class="mt-1 small text-secondary"><?= htmlspecialchars($userGroups) ?></div>
                         </div>
                     </a>

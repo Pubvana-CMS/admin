@@ -8,8 +8,17 @@ use Enlivenapp\FlightShield\Models\AuthGroup;
 use Enlivenapp\FlightShield\Models\AuthGroupPermission;
 use Enlivenapp\FlightShield\Models\AuthPermission;
 
+/**
+ * Admin group management — CRUD and permission sync for auth groups.
+ */
 class GroupsController extends AdminController
 {
+    /**
+     * Find a group by ID, or null if not found.
+     *
+     * @param int $id Group ID
+     * @return AuthGroup|null
+     */
     protected function findGroup(int $id): ?AuthGroup
     {
         $group = new AuthGroup($this->app->get('db'));
@@ -18,11 +27,20 @@ class GroupsController extends AdminController
         return $group->isHydrated() ? $group : null;
     }
 
+    /**
+     * @return AuthPermission[]
+     */
     protected function allPermissions(): array
     {
         return (new AuthPermission($this->app->get('db')))->findAll();
     }
 
+    /**
+     * Get all permission aliases assigned to a group.
+     *
+     * @param string $alias Group alias
+     * @return string[]
+     */
     protected function getGroupPermissions(string $alias): array
     {
         $records = (new AuthGroupPermission($this->app->get('db')))
@@ -32,6 +50,13 @@ class GroupsController extends AdminController
         return array_map(fn($r) => $r->permission_alias, $records);
     }
 
+    /**
+     * Replace all permissions for a group with the given set.
+     *
+     * @param string   $alias       Group alias
+     * @param string[] $permissions Permission aliases to assign
+     * @return void
+     */
     protected function syncGroupPermissions(string $alias, array $permissions): void
     {
         $db = $this->app->get('db');
@@ -56,6 +81,11 @@ class GroupsController extends AdminController
         }
     }
 
+    /**
+     * List all groups.
+     *
+     * @return void
+     */
     public function index(): void
     {
         $groups = (new AuthGroup($this->app->get('db')))->findAll();
@@ -66,6 +96,11 @@ class GroupsController extends AdminController
         ]);
     }
 
+    /**
+     * Show the create group form.
+     *
+     * @return void
+     */
     public function create(): void
     {
         $this->render('groups/form', [
@@ -76,6 +111,11 @@ class GroupsController extends AdminController
         ]);
     }
 
+    /**
+     * Store a new group from POST data.
+     *
+     * @return void
+     */
     public function store(): void
     {
         $post = $this->app->request()->data;
@@ -101,6 +141,12 @@ class GroupsController extends AdminController
         $this->app->redirect('/admin/groups');
     }
 
+    /**
+     * Show the edit form for a group.
+     *
+     * @param string $id Group ID
+     * @return void
+     */
     public function edit(string $id): void
     {
         $group = $this->findGroup((int) $id);
@@ -118,6 +164,12 @@ class GroupsController extends AdminController
         ]);
     }
 
+    /**
+     * Update an existing group from POST data.
+     *
+     * @param string $id Group ID
+     * @return void
+     */
     public function update(string $id): void
     {
         $group = $this->findGroup((int) $id);
@@ -140,6 +192,12 @@ class GroupsController extends AdminController
         $this->app->redirect('/admin/groups');
     }
 
+    /**
+     * Delete a group and its permission assignments.
+     *
+     * @param string $id Group ID
+     * @return void
+     */
     public function delete(string $id): void
     {
         $group = $this->findGroup((int) $id);

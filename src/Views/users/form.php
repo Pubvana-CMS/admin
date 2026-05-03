@@ -16,26 +16,9 @@
 $permissions      = $permissions ?? [];
 $userDenied       = $userDenied ?? [];
 $groupPermissions = $groupPermissions ?? [];
+$groupGranted     = $groupGranted ?? [];
 $pluginTabs       = $pluginTabs ?? [];
-
-/**
- * Check if a permission is granted by group permissions (supports wildcards).
- */
-function permissionGrantedByGroup(string $permission, array $groupPerms): bool {
-    if (in_array($permission, $groupPerms, true) || in_array('*', $groupPerms, true)) {
-        return true;
-    }
-    foreach ($groupPerms as $gp) {
-        if (str_contains($gp, '*')) {
-            $pattern = str_replace('*', '.*', preg_quote($gp, '/'));
-            if (preg_match('/^' . $pattern . '$/', $permission)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-$userPermissions = $userPermissions ?? [];
+$userPermissions  = $userPermissions ?? [];
 
 $isEdit = $user !== null;
 $action = $isEdit ? "/admin/users/{$user->id}/update" : '/admin/users/store';
@@ -187,7 +170,7 @@ $allowedFieldTypes = ['string', 'text', 'integer', 'double', 'boolean', 'media_i
                                                         $isDenied  = in_array($p->alias, $userDenied, true);
                                                         $state     = $isDenied ? 'deny' : ($isGranted ? 'grant' : 'inherit');
                                                     ?>
-                                                    <?php $hasGroup = permissionGrantedByGroup($p->alias, $groupPermissions); ?>
+                                                    <?php $hasGroup = in_array($p->alias, $groupGranted, true); ?>
                                                     <tr>
                                                         <td>
                                                             <code><?= htmlspecialchars($p->alias) ?></code>

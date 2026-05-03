@@ -6,8 +6,7 @@
  * @license   MIT
  */
 
-$routePrepend = 'admin';
-
 return [
-    'site_name' => 'Pubvana',
+    'routePrepend' => '',
+    'site_name'    => 'Pubvana',
 ];

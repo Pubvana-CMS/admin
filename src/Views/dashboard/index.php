@@ -4,190 +4,143 @@
  *
  * @var string $pageTitle
  * @var string $username
- * @var int    $totalUsers
- * @var int    $activeUsers
- * @var int    $activePercent
- * @var float  $percentChange
- * @var int    $newThisMonth
- * @var int    $newLastMonth
- * @var array  $logins
- * @var array  $usersByMonth
+ * @var array  $cards
+ * @var array  $sections
  */
 ?>
 
-<!-- Top row: Welcome | Total Users | Active Users -->
-<div class="row row-deck row-cards">
-
-    <!-- Welcome card -->
-    <div class="col-sm-12 col-lg-6">
+<div class="row row-deck row-cards mb-3">
+    <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="row gy-3">
-                    <div class="col-12 col-sm-6 d-flex flex-column">
-                        <h3 class="h2">Welcome back, <?= htmlspecialchars($username) ?></h3>
-                        <p class="text-secondary">You have 0 new messages and 0 new notifications.</p>
-
-                        <div class="row g-5 mt-auto">
-                            <div class="col-auto">
-                                <div class="subheader">Today's Sales</div>
-                                <div class="d-flex align-items-baseline">
-                                    <div class="h3 me-2">&mdash;</div>
-                                </div>
-                                <div class="progress progress-sm" style="width: 80px;">
-                                    <div class="progress-bar bg-success" style="width: 0%" role="progressbar"></div>
-                                </div>
-                            </div>
-
-                            <div class="col-auto">
-                                <div class="subheader">Growth Rate</div>
-                                <div class="d-flex align-items-baseline">
-                                    <div class="h3 me-2">&mdash;</div>
-                                </div>
-                                <div class="progress progress-sm" style="width: 80px;">
-                                    <div class="progress-bar bg-danger" style="width: 0%" role="progressbar"></div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                    <div>
+                        <div class="subheader">Admin Overview</div>
+                        <h2 class="mb-1">Welcome back, <?= htmlspecialchars($username) ?></h2>
+                        <div class="text-secondary">A quick look at what is live, what is waiting, and what needs attention.</div>
                     </div>
-                    <div class="col-12 col-sm-6 d-flex justify-content-center align-items-center">
-                        <!-- reserved -->
+                    <div class="text-secondary small">
+                        Dashboard contributions come from installed Pubvana packages.
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Total Users -->
-    <div class="col-sm-6 col-lg-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="subheader">Total Users</div>
-                <div class="d-flex align-items-baseline">
-                    <div class="h1 mb-0 me-2"><?= number_format($totalUsers) ?></div>
-                    <div class="me-auto">
-                        <?php if ($percentChange != 0): ?>
-                            <span class="text-<?= $percentChange > 0 ? 'green' : 'red' ?> d-inline-flex align-items-center lh-1">
-                                <?= $percentChange > 0 ? '+' : '' ?><?= $percentChange ?>%
-                                <i class="ti ti-arrow-<?= $percentChange > 0 ? 'up' : 'down' ?> ms-1" style="font-size:.75rem"></i>
+<?php if (!empty($cards)): ?>
+<div class="row row-deck row-cards mb-3">
+    <?php foreach ($cards as $card): ?>
+        <?php $tone = htmlspecialchars($card['tone'] ?? 'primary'); ?>
+        <div class="col-sm-6 col-xl-4 col-xxl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                        <div>
+                            <div class="subheader"><?= htmlspecialchars((string) $card['label']) ?></div>
+                            <div class="h1 mb-1"><?= htmlspecialchars((string) $card['value']) ?></div>
+                            <?php if (!empty($card['description'])): ?>
+                                <div class="text-secondary"><?= htmlspecialchars((string) $card['description']) ?></div>
+                            <?php endif; ?>
+                        </div>
+                        <?php if (!empty($card['icon'])): ?>
+                            <span class="avatar avatar-md bg-<?= $tone ?>-lt text-<?= $tone ?>">
+                                <i class="ti <?= htmlspecialchars((string) $card['icon']) ?>"></i>
                             </span>
                         <?php endif; ?>
                     </div>
+
+                    <?php if (!empty($card['trend']) && is_array($card['trend'])): ?>
+                        <div class="mt-3 text-secondary small">
+                            <span class="text-<?= htmlspecialchars((string) ($card['trend']['direction'] === 'down' ? 'danger' : ($card['trend']['direction'] === 'up' ? 'success' : 'secondary'))) ?>">
+                                <?= htmlspecialchars((string) ($card['trend']['value'] ?? '')) ?>
+                            </span>
+                            <?php if (!empty($card['trend']['label'])): ?>
+                                <span><?= htmlspecialchars((string) $card['trend']['label']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <div class="text-secondary mt-2">
-                    <?php if ($newThisMonth > 0): ?>
-                        <?= number_format($newThisMonth) ?> users increased from last month
+                <?php if (!empty($card['href'])): ?>
+                    <div class="card-footer bg-transparent">
+                        <a href="<?= htmlspecialchars((string) $card['href']) ?>" class="btn btn-sm btn-outline-secondary">Open</a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<?php if (!empty($sections)): ?>
+<div class="row row-deck row-cards">
+    <?php foreach ($sections as $section): ?>
+        <?php $tone = htmlspecialchars($section['tone'] ?? 'primary'); ?>
+        <div class="col-12 col-xl-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title mb-1">
+                            <?php if (!empty($section['icon'])): ?>
+                                <i class="ti <?= htmlspecialchars((string) $section['icon']) ?> me-2 text-<?= $tone ?>"></i>
+                            <?php endif; ?>
+                            <?= htmlspecialchars((string) $section['title']) ?>
+                        </h3>
+                        <?php if (!empty($section['description'])): ?>
+                            <div class="text-secondary small"><?= htmlspecialchars((string) $section['description']) ?></div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!empty($section['href'])): ?>
+                        <div class="card-actions">
+                            <a href="<?= htmlspecialchars((string) $section['href']) ?>" class="btn btn-sm btn-outline-secondary">View all</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="list-group list-group-flush">
+                    <?php if (($section['type'] ?? 'list') === 'actions'): ?>
+                        <?php if (empty($section['items'])): ?>
+                            <div class="list-group-item text-secondary"><?= htmlspecialchars((string) ($section['empty_state'] ?? 'Nothing to show yet.')) ?></div>
+                        <?php else: ?>
+                            <div class="card-body">
+                                <div class="btn-list">
+                                    <?php foreach ($section['items'] as $item): ?>
+                                        <?php $emphasis = htmlspecialchars((string) ($item['emphasis'] ?? 'secondary')); ?>
+                                        <a href="<?= htmlspecialchars((string) $item['href']) ?>" class="btn btn-outline-<?= $emphasis ?>">
+                                            <?php if (!empty($item['icon'])): ?>
+                                                <i class="ti <?= htmlspecialchars((string) $item['icon']) ?> me-1"></i>
+                                            <?php endif; ?>
+                                            <?= htmlspecialchars((string) $item['label']) ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
-                        No new users this month
+                        <?php if (empty($section['items'])): ?>
+                            <div class="list-group-item text-secondary"><?= htmlspecialchars((string) ($section['empty_state'] ?? 'Nothing to show yet.')) ?></div>
+                        <?php else: ?>
+                            <?php foreach ($section['items'] as $item): ?>
+                                <?php $emphasis = htmlspecialchars((string) ($item['emphasis'] ?? 'secondary')); ?>
+                                <a href="<?= htmlspecialchars((string) ($item['href'] ?? '#')) ?>" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center justify-content-between gap-3">
+                                        <div>
+                                            <div class="fw-medium"><?= htmlspecialchars((string) $item['label']) ?></div>
+                                            <?php if (!empty($item['meta'])): ?>
+                                                <div class="text-secondary small"><?= htmlspecialchars((string) $item['meta']) ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <span class="badge bg-<?= $emphasis ?>-lt text-<?= $emphasis ?>">
+                                            <?= htmlspecialchars(ucfirst((string) $emphasis)) ?>
+                                        </span>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
-            <div id="chart-total-users" class="position-relative"></div>
         </div>
-    </div>
-
-    <!-- Active Users -->
-    <div class="col-sm-6 col-lg-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="subheader">Active Users</div>
-                <div class="d-flex align-items-baseline mb-2">
-                    <div class="h1 mb-0 me-2"><?= number_format($activeUsers) ?></div>
-                </div>
-                <div id="chart-active-users" class="position-relative"></div>
-            </div>
-        </div>
-    </div>
-
+    <?php endforeach; ?>
 </div>
-
-<!-- Login activity row -->
-<div class="row row-deck row-cards mt-3">
-    <div class="col-sm-6 col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="subheader">Login Attempts (30 days)</div>
-                <div class="h1 mb-3"><?= number_format($logins['total']) ?></div>
-                <div class="d-flex">
-                    <span class="text-green me-3">
-                        <i class="ti ti-check me-1"></i><?= number_format($logins['success']) ?> successful
-                    </span>
-                    <span class="text-red">
-                        <i class="ti ti-x me-1"></i><?= number_format($logins['failed']) ?> failed
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Charts -->
-<?php
-    $monthLabels = array_keys($usersByMonth);
-    $monthData   = array_values($usersByMonth);
-?>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    if (!window.ApexCharts) return;
-
-    // Total Users — sparkline from real monthly registration data
-    new ApexCharts(document.getElementById('chart-total-users'), {
-        chart: {
-            type: 'line',
-            fontFamily: 'inherit',
-            height: 96,
-            sparkline: { enabled: true },
-            animations: { enabled: false },
-        },
-        stroke: {
-            width: 2,
-            lineCap: 'round',
-            curve: 'smooth',
-        },
-        series: [{
-            name: 'New users',
-            data: <?= json_encode($monthData) ?>
-        }],
-        xaxis: {
-            categories: <?= json_encode($monthLabels) ?>
-        },
-        tooltip: { theme: 'dark' },
-        grid: { strokeDashArray: 4 },
-        colors: ['var(--tblr-primary)'],
-        legend: { show: false },
-    }).render();
-
-    // Active Users — radialBar
-    new ApexCharts(document.getElementById('chart-active-users'), {
-        chart: {
-            type: 'radialBar',
-            fontFamily: 'inherit',
-            height: 192,
-            sparkline: { enabled: true },
-            animations: { enabled: false },
-        },
-        plotOptions: {
-            radialBar: {
-                startAngle: -120,
-                endAngle: 120,
-                hollow: {
-                    margin: 16,
-                    size: '50%',
-                },
-                dataLabels: {
-                    show: true,
-                    name: { show: false },
-                    value: {
-                        offsetY: 0,
-                        fontSize: '24px',
-                    },
-                },
-            },
-        },
-        series: [<?= (int) $activePercent ?>],
-        labels: ['Active'],
-        tooltip: { enabled: false },
-        colors: ['var(--tblr-primary)'],
-        legend: { show: false },
-    }).render();
-});
-</script>
+<?php endif; ?>

@@ -10,6 +10,9 @@ use Enlivenapp\FlightShield\Models\AuthPermission;
 use Enlivenapp\FlightShield\Models\User;
 use Enlivenapp\FlightShield\Models\UserIdentity;
 
+/**
+ * Admin user management — CRUD, group/permission sync, ban/unban.
+ */
 class UsersController extends AdminController
 {
     protected function userModel(): User
@@ -48,7 +51,7 @@ class UsersController extends AdminController
      * Get all permissions granted to a user via their groups.
      * Returns a flat array of permission aliases, with wildcards expanded.
      */
-    protected function getGroupPermissionsForUser($user): array
+    protected function getGroupPermissionsForUser(User $user): array
     {
         $db = $this->app->get('db');
         $userGroups = $user->getGroups();
@@ -65,6 +68,38 @@ class UsersController extends AdminController
         }
 
         return array_unique($groupPerms);
+    }
+
+    /**
+     * Resolve which permission aliases are effectively granted by group permissions.
+     * Expands wildcards (e.g. admin.*) against the full permission list.
+     *
+     * @param array $permissions All AuthPermission entities
+     * @param array $groupPerms  Flat array of group permission aliases (may contain wildcards)
+     * @return array Flat array of granted permission aliases
+     */
+    protected function resolveGroupGrantedPermissions(array $permissions, array $groupPerms): array
+    {
+        $granted = [];
+
+        foreach ($permissions as $p) {
+            if (in_array($p->alias, $groupPerms, true) || in_array('*', $groupPerms, true)) {
+                $granted[] = $p->alias;
+                continue;
+            }
+
+            foreach ($groupPerms as $gp) {
+                if (str_contains($gp, '*')) {
+                    $pattern = str_replace('*', '.*', preg_quote($gp, '/'));
+                    if (preg_match('/^' . $pattern . '$/', $p->alias)) {
+                        $granted[] = $p->alias;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $granted;
     }
 
     /**
@@ -160,10 +195,11 @@ class UsersController extends AdminController
             'email'           => $identity->secret ?? '',
             'groups'          => $this->allGroups($isSuperadmin),
             'userGroups'      => $user->getGroups(),
-            'permissions'       => $this->allPermissions(),
+            'permissions'       => $permissions = $this->allPermissions(),
             'userPermissions'   => $user->getPermissions(),
             'userDenied'        => $user->getDeniedPermissions(),
-            'groupPermissions'  => $this->getGroupPermissionsForUser($user),
+            'groupPermissions'  => $groupPerms = $this->getGroupPermissionsForUser($user),
+            'groupGranted'      => $this->resolveGroupGrantedPermissions($permissions, $groupPerms),
             'pluginTabs'        => $this->app->adext('page', 'users.edit.tabs', $tabContext),
         ]);
     }
