@@ -1,0 +1,142 @@
+/* ── Pubvana base block styles ── */
+
+.pv-block {
+    margin-bottom: 1rem;
+}
+
+.pv-block-title {
+    font-size: .875rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.pv-block-ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.pv-block-li {
+    padding: .35rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, .08);
+}
+
+.pv-block-li:last-child {
+    border-bottom: none;
+}
+
+.pv-block-a {
+    color: #1a6b3c;
+    text-decoration: none;
+}
+
+.pv-block-a:hover {
+    text-decoration: underline;
+}
+
+.pv-block-meta {
+    display: block;
+    color: #777;
+    font-size: .75rem;
+}
+
+.pv-block-content {
+    font-size: .875rem;
+    line-height: 1.6;
+}
+
+.pv-block-search {
+    /* search block wrapper */
+}
+
+.pv-block-text {
+    /* text block wrapper */
+}
+
+.pv-block-search-form {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.pv-block-label {
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.pv-block-input {
+    display: block;
+    width: 100%;
+    padding: .5rem .65rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: .25rem;
+    appearance: none;
+}
+
+.pv-block-input:focus {
+    border-color: #1a6b3c;
+    outline: 0;
+    box-shadow: 0 0 0 .2rem rgba(26, 107, 60, .2);
+}
+
+.pv-block-button {
+    display: inline-block;
+    padding: .6rem .9rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #fff;
+    background-color: #1a6b3c;
+    border: 1px solid #1a6b3c;
+    border-radius: .25rem;
+    cursor: pointer;
+    text-align: center;
+}
+
+.pv-block-button:hover {
+    background-color: #145530;
+    border-color: #145530;
+}
+
+.pv-block-toc .pv-block-li {
+    border-bottom: none;
+    padding: .2rem 0;
+}
+
+.pv-block-toc-h3 {
+    padding-left: 1rem;
+}
+
+.pv-block-toc-h4 {
+    padding-left: 2rem;
+}
+
+footer .pv-block-title {
+    color: rgba(255, 255, 255, .9);
+}
+
+footer .pv-block-a {
+    color: rgba(255, 255, 255, .7);
+}
+
+footer .pv-block-a:hover {
+    color: #fff;
+}
+
+footer .pv-block-meta {
+    color: rgba(255, 255, 255, .5);
+}
+
+footer .pv-block-input {
+    background-color: rgba(255, 255, 255, .1);
+    border-color: rgba(255, 255, 255, .2);
+    color: #fff;
+}
+
+footer .pv-block-content {
+    color: rgba(255, 255, 255, .7);
+}

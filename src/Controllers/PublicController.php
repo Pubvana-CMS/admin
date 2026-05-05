@@ -48,7 +48,7 @@ abstract class PublicController
         }
 
         $global = $this->buildGlobalData($data);
-        $viewData = array_merge($global, $data);
+        $viewData = array_merge($global, $this->processRenderableContent($data));
 
         $siteName = $this->getSiteName();
         $pageTitle = $data['title'] ?? $data['archive_title'] ?? 'Home';
@@ -77,6 +77,34 @@ abstract class PublicController
     }
 
     /**
+     * Run shared content processors against renderable content fields.
+     */
+    protected function processRenderableContent(array $data): array
+    {
+        if (!isset($data['content']) || !is_string($data['content']) || $data['content'] === '') {
+            return $data;
+        }
+
+        $context = [
+            'content'       => $data['content'],
+            'template_data' => $data,
+        ];
+
+        $processors = $this->app->adext('content', 'render', $context) ?: [];
+        $content = $data['content'];
+
+        foreach ($processors as $processor) {
+            if (isset($processor['output']) && is_string($processor['output'])) {
+                $content = $processor['output'];
+                $context['content'] = $content;
+            }
+        }
+
+        $data['content'] = $content;
+        return $data;
+    }
+
+    /**
      * Assemble global data available to every public page.
      */
     protected function buildGlobalData(array $routeData = []): array
@@ -97,10 +125,10 @@ abstract class PublicController
                 'title' => '', // Set in render()
                 'meta'  => [],
                 'og'    => [],
-                'css'   => [],
+                'css'   => $this->collectPackageAssets('head', 'css'),
             ],
             'footer' => [
-                'js'    => [],
+                'js'    => $this->collectPackageAssets('footer', 'js'),
             ],
             'nav' => $this->getNavigation('primary'),
             'nav_footer' => $this->getNavigation('footer'),
@@ -110,6 +138,50 @@ abstract class PublicController
             'breadcrumbs' => $this->buildBreadcrumbs($routeData),
             'theme_regions' => $themeRegions,
         ];
+    }
+
+    /**
+     * Collect registered package assets from adext and resolve theme override paths.
+     *
+     * For each registered file, checks for a theme override at:
+     *   public/themes/{active_theme}/assets/{vendor}/{package}/{file}
+     * Falls back to the package default at:
+     *   public/assets/{vendor}/{package}/{file}
+     *
+     * @param string $type adext type ('head' or 'footer')
+     * @param string $name adext name ('css' or 'js')
+     * @return string[] Browser-relative URLs
+     */
+    protected function collectPackageAssets(string $type, string $name): array
+    {
+        $registered = $this->app->adext($type, $name) ?: [];
+        $activeTheme = $this->getActiveThemeName();
+        $publicPath = rtrim((string) (defined('PROJECT_ROOT') ? PROJECT_ROOT : dirname(__DIR__, 5)), '/') . '/public/';
+        $urls = [];
+
+        foreach ($registered as $entry) {
+            $vendor = $entry['vendor'] ?? '';
+            $package = $entry['package'] ?? '';
+            $files = $entry['files'] ?? [];
+
+            if ($vendor === '' || $package === '') {
+                continue;
+            }
+
+            foreach ($files as $file) {
+                $overridePath = $publicPath . 'themes/' . $activeTheme
+                    . '/assets/' . $vendor . '/' . $package . '/' . $file;
+
+                if (is_file($overridePath)) {
+                    $urls[] = '/themes/' . $activeTheme
+                        . '/assets/' . $vendor . '/' . $package . '/' . $file;
+                } else {
+                    $urls[] = '/assets/' . $vendor . '/' . $package . '/' . $file;
+                }
+            }
+        }
+
+        return $urls;
     }
 
     /**

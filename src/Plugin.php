@@ -12,6 +12,13 @@ class Plugin implements PluginInterface
 {
     public function register(Engine $app, Router $router, array $config = []): void
     {
+        $app->adext('head', 'css', 'pubvana.admin.blocks', [
+            'priority' => 5,
+            'files'    => ['css/blocks.css'],
+            'vendor'   => 'pubvana',
+            'package'  => 'admin',
+        ]);
+
         $app->adext('page', 'dashboard.sections', 'pubvana.admin', [
             'label'    => 'Admin',
             'priority' => 90,

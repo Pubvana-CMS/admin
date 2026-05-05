@@ -1,10 +1,10 @@
-<div class="block">
-    <div class="block-text">
+<div class="pv-block">
+    <div class="pv-block-text">
         {% if title %}
-        <h6 class="block-title">{{ title }}</h6>
+        <h6 class="pv-block-title">{{ title }}</h6>
         {% endif %}
         {% if content %}
-        <div class="block-content">{! content !}</div>
+        <div class="pv-block-content">{! content !}</div>
         {% endif %}
     </div>
 </div>
