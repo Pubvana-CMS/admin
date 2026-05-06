@@ -123,8 +123,7 @@ abstract class PublicController
             ],
             'header' => [
                 'title' => '', // Set in render()
-                'meta'  => [],
-                'og'    => [],
+                'seo'  => $this->buildSeo(),
                 'css'   => $this->collectPackageAssets('head', 'css'),
             ],
             'footer' => [
@@ -375,5 +374,17 @@ abstract class PublicController
         }
 
         return $defaults;
+    }
+
+    /**
+     * Build SEO and returns string full of SEO html tags.
+     */
+    protected function buildSeo(): string
+    {
+        try {
+            return $this->app->seo()->renderHead();
+        } catch (\Throwable) {
+            return '';
+        }
     }
 }
