@@ -108,25 +108,6 @@ class Plugin implements PluginInterface
             ],
         ]);
 
-        $app->adext('block', 'available', 'pubvana.admin.search', [
-            'label'       => 'Search Form',
-            'description' => 'Site search form',
-            'provider'    => fn(array $options) => [
-                'action'      => $options['action'] ?? '/search',
-                'label'       => $options['label'] ?? 'Search',
-                'placeholder' => $options['placeholder'] ?? 'Search...',
-                'button_text' => $options['button_text'] ?? 'Go',
-            ],
-            'template'    => 'pubvana/admin/public/blocks/search',
-            'priority'    => 10,
-            'options'     => [
-                'action'      => ['type' => 'input', 'label' => 'Form Action URL', 'default' => '/search'],
-                'label'       => ['type' => 'input', 'label' => 'Label', 'default' => 'Search'],
-                'placeholder' => ['type' => 'input', 'label' => 'Placeholder', 'default' => 'Search...'],
-                'button_text' => ['type' => 'input', 'label' => 'Button Text', 'default' => 'Go'],
-            ],
-        ]);
-
         $app->adext('block', 'available', 'pubvana.admin.text', [
             'label'       => 'Text Block',
             'description' => 'Free-form text or HTML content',

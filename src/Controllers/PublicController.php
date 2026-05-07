@@ -54,7 +54,7 @@ abstract class PublicController
         $pageTitle = $data['title'] ?? $data['archive_title'] ?? 'Home';
         $viewData['header']['title'] = $pageTitle . ' - ' . $siteName;
 
-        // Resolve template: app/views/themes/{name}/ override → theme's Views/
+        // Resolve template: app override, theme root, then PluginView (package views)
         $appOverride = $this->app->get('flight.views.path')
             . DIRECTORY_SEPARATOR . 'themes'
             . DIRECTORY_SEPARATOR . $this->getActiveThemeName()
@@ -62,12 +62,14 @@ abstract class PublicController
 
         if (file_exists($appOverride)) {
             $templateFile = $appOverride;
-        } else {
+        } elseif (file_exists($themePath . DIRECTORY_SEPARATOR . $template . '.tpl')) {
             $templateFile = $themePath . DIRECTORY_SEPARATOR . $template . '.tpl';
-        }
-
-        if (!file_exists($templateFile)) {
-            throw new NotFoundException("Theme template not found: {$template}.tpl");
+        } else {
+            $view->extension = '.tpl';
+            $templateFile = $view->getTemplate($template);
+            if (!file_exists($templateFile)) {
+                throw new NotFoundException("Template not found: {$template}.tpl");
+            }
         }
 
         // Render through Vision with theme's Views/ as basePath for extends/includes
